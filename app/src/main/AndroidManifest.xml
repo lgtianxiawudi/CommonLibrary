@@ -3,6 +3,7 @@
     package="apublic.lg.com.commonlib.demo">
 
     <application
+        android:name="apublic.lg.com.demo.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

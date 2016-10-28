@@ -131,27 +131,37 @@ public class LogUtil {
 
     private static void vLog(String tag, String msg) {
         String tagL = StrUtil.isEmpty(tag) ? generateTag(Thread.currentThread().getStackTrace()[4]) : tag;
+        Log.v(tagL,"******************start************************");
         Log.v(tagL, msg);
+        Log.v(tagL,"******************end************************");
     }
 
     private static void dLog(String tag, String msg) {
         String tagL = StrUtil.isEmpty(tag) ? generateTag(Thread.currentThread().getStackTrace()[4]) : tag;
+        Log.d(tagL,"******************start************************");
         Log.d(tagL, msg);
+        Log.d(tagL,"******************end************************");
     }
 
     private static void eLog(String tag, String msg) {
         String tagL = StrUtil.isEmpty(tag) ? generateTag(Thread.currentThread().getStackTrace()[4]) : tag;
+        Log.e(tagL,"******************start************************");
         Log.e(tagL, msg);
+        Log.e(tagL,"******************end************************");
     }
 
     private static void wLog(String tag, String msg) {
         String tagL = StrUtil.isEmpty(tag) ? generateTag(Thread.currentThread().getStackTrace()[4]) : tag;
+        Log.w(tagL,"******************start************************");
         Log.w(tagL, msg);
+        Log.w(tagL,"******************end************************");
     }
 
     private static void iLog(String tag, String msg) {
         String tagL = StrUtil.isEmpty(tag) ? generateTag(Thread.currentThread().getStackTrace()[4]) : tag;
+        Log.i(tagL,"******************start************************");
         Log.i(tagL, msg);
+        Log.i(tagL,"******************end************************");
     }
 
     private static String generateTag(StackTraceElement stack) {

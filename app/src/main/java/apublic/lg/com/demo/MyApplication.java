@@ -15,5 +15,6 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         LogUtil.setEnvIsdebug(BuildConfig.IS_DEBUG);
+        LogUtil.e("LogTest");
     }
 }
