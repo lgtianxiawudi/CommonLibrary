@@ -19,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
 }
 
 dependencies {
@@ -27,6 +32,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
     testCompile 'junit:junit:4.12'
 }
 //添加
@@ -34,7 +40,7 @@ publish {
     userOrg = 'lgtianxiawudi'//bintray.com用户名
     groupId = 'apublic.lg.com.commonlib'//jcenter上的路径
     artifactId = 'CommonLib'//项目名称
-    publishVersion = '0.0.1'//版本号
+    publishVersion = '0.0.2'//版本号
     desc = 'Oh hi, this is a nice description for a project, right?'//描述，不重要
     website = 'https://github.com/lgtianxiawudi/StudyDemo'//网站，不重要；尽量模拟github上的地址，例如我这样的；当然你有地址最好了
     licences = ['Apache-2.0']

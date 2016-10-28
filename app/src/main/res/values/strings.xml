@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CommonLib</string>
+    <string name="main_title">学习内容目录</string>
+    <string name="main_tab_index">主页</string>
+    <string name="main_tab_message">消息</string>
+    <string name="main_tab_shop">商店</string>
+    <string name="main_tab_library">Lib</string>
 </resources>

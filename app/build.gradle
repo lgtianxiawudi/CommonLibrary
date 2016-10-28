@@ -4,18 +4,52 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
     defaultConfig {
-        applicationId "apublic.lg.com.commonlib"
+        applicationId "apublic.lg.com.commonlib.demo"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        debug {
+            keyAlias 'android'
+            keyPassword 'Hcloud@1234'
+            storeFile file('../app/key/Hcloud@1234.keystore')
+            storePassword 'Hcloud@1234'
+        }
+        release {
+            keyAlias 'android'
+            keyPassword 'Hcloud@1234'
+            storeFile file('../app/key/Hcloud@1234.keystore')
+            storePassword 'Hcloud@1234'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
+            buildConfigField "boolean","IS_DEBUG","false"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+            buildConfigField "boolean","IS_DEBUG","true"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        // set to true to turn off analysis progress reporting by lint
+        quiet true
+        // if true, stop the gradle build if errors are found
+        abortOnError false
+        // if true, only report errors
+        ignoreWarnings true
+    }
+    dexOptions{
+        javaMaxHeapSize "2g"
+    }
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
     }
 }
 
@@ -24,6 +58,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile project(':CommonLib')
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
 }
