@@ -1,5 +1,6 @@
 package apublic.lg.com.commonlib.bridge;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -38,7 +39,7 @@ public class BridgeInstance {
 
     public Map<String, BridgeCallBackFunction> responseCallbacks = new HashMap<String, BridgeCallBackFunction>();
     public Map<String, BridgeHandler> messageHandlers = new HashMap<String, BridgeHandler>();
-    private List<BrgideMessage> startupMessage = new ArrayList<BrgideMessage>();
+//    private List<BrgideMessage> startupMessage = new ArrayList<BrgideMessage>();
     private long uniqueId = 0;
 
     private static BridgeInstance singleton;
@@ -64,21 +65,31 @@ public class BridgeInstance {
         return singleton;
     }
 
-    private BridgeInstance(WebView context) {
+    private BridgeInstance(WebView webView) {
+        if (webView == null){
+            return;
+        }
         this.webView = webView;
-        webViewLoadLocalJs(webView);
+        this.webView.setVerticalScrollBarEnabled(false);
+        this.webView.setHorizontalScrollBarEnabled(false);
+        this.webView.getSettings().setJavaScriptEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+        this.webView.setWebChromeClient(new BridgeChromeClient());
+        this.webView.setWebViewClient(new BridgeWebClient());
     }
 
     /**
      * 初始化JSBridge
-     * @param view
      */
-    public void webViewLoadLocalJs(WebView view) {
+    public void webViewLoadLocalJs() {
         LogUtil.e("webViewLoadLocalJs", "webViewLoadLocalJs");
-        String base64 = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(view.getContext(), base64Js));
-        String jsContent = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(view.getContext(), toLoadJs));
-        view.loadUrl(JAVASCRIPT_STR + base64);
-        view.loadUrl(JAVASCRIPT_STR + jsContent);
+        String base64 = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), base64Js));
+        String jsContent = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), toLoadJs));
+        this.webView.loadUrl(JAVASCRIPT_STR+"alert('ss');");
+        this.webView.loadUrl(JAVASCRIPT_STR + base64);
+        this.webView.loadUrl(JAVASCRIPT_STR + jsContent);
     }
 
     /**
@@ -101,11 +112,11 @@ public class BridgeInstance {
      * @param m
      */
     public void queueMessage(BrgideMessage m) {
-        if (startupMessage != null) {
-            startupMessage.add(m);
-        } else {
+//        if (startupMessage != null) {
+//            startupMessage.add(m);
+//        } else {
             dispatchMessage(m);
-        }
+//        }
     }
 
     private void dispatchMessage(BrgideMessage m) {

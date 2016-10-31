@@ -1,0 +1,69 @@
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>
+        js调用java
+    </title>
+    <script src="base64.min.js"></script>
+    <script src="WebViewJavascriptBridge.js"></script>
+</head>
+
+<body>
+<p>
+    <xmp id="show">
+    </xmp>
+</p>
+<p>
+    <xmp id="init">
+    </xmp>
+</p>
+<p>
+    <input type="text" id="text1" value="用户名(username)" />
+</p>
+<p>
+    <input type="text" id="text2" value="password" />
+</p>
+<p>
+    <input type="button" id="enter" value="调用Native方法异步" onclick="testClick1();"
+            />
+</p>
+<p>
+    <input type="button" id="enter1" value="调用Native方法同步" onclick="testClick1();"
+            />
+</p>
+<p>
+    <input type="button" id="enter2" value="显示html" onclick="testDiv();" />
+</p>
+<p>
+    <input type="file" value="打开文件" />
+</p>
+</body>
+<script>
+        function testDiv() {
+            document.getElementById("show").innerHTML = document.getElementsByTagName("html")[0].innerHTML;
+        }
+
+        function testClick1() {
+            var str1 = document.getElementById("text1").value;
+            var str2 = document.getElementById("text2").value;
+            alert("log");
+            //call native method
+            if(window.WebViewJavascriptBridge){
+                alert("SUCCESS");
+            }
+            window.WebViewJavascriptBridge.callHandler(
+                'submitFromWeb'
+                , {'param': '中文测试'}
+                , function(response) {
+                alert("send get responseData from java, data = " + response);
+                    document.getElementById("show").innerHTML = "send get responseData from java, data = " + response
+                }
+            );
+        }
+
+        function bridgeLog(logContent) {
+            document.getElementById("show").innerHTML = logContent;
+        }
+    </script>
+
+</html>
