@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.webkit.JsPromptResult;
 import android.webkit.WebView;
 
 import java.util.ArrayList;
@@ -23,7 +24,8 @@ import apublic.lg.com.commonlib.util.StrUtil;
 public class BridgeInstance {
     public final static String YY_OVERRIDE_SCHEMA = "wvjbscheme://";
     public final static String YY_RETURN_DATA = YY_OVERRIDE_SCHEMA + "return/";//格式为   yy://return/{function}/returncontent
-    public final static String YY_FETCH_QUEUE = YY_RETURN_DATA + "__WVJB_QUEUE_MESSAGE__/";
+    public final static String YY_FETCH_QUEUE = YY_OVERRIDE_SCHEMA + "__WVJB_QUEUE_MESSAGE__";//wvjbscheme://__WVJB_QUEUE_MESSAGE__
+    public final static String YY_TETCH_QUEUE_SYN = YY_OVERRIDE_SCHEMA+"__SYN_WVJB_QUEUE_MESSAGE__/";
     public final static String EMPTY_STR = "";
     public final static String UNDERLINE_STR = "_";
     public final static String SPLIT_MARK = "/";
@@ -108,6 +110,24 @@ public class BridgeInstance {
     }
 
     /**
+     * 接受返回的数据
+     * @param url
+     */
+    public void handlerReturnDataSyn(String url, final JsPromptResult result) {
+        String dataFromReturnUrlSyn = BridgeUtil.getDataFromReturnUrlSyn(url);
+        BrgideMessage brgideMessage = BrgideMessage.toObject(dataFromReturnUrlSyn);
+        BridgeHandler f = messageHandlers.get(brgideMessage.getHandlerName());
+        if (f != null) {
+            f.handler(brgideMessage.getData(), new BridgeCallBackFunction() {
+                @Override
+                public void onCallBack(String data) {
+                    result.confirm(data+"");
+                }
+            });
+        }
+    }
+
+    /**
      * native数据处理完成后的异步返回
      * @param m
      */
@@ -145,11 +165,15 @@ public class BridgeInstance {
 
             switch (msg.arg1) {
                 case FLUSHMESSAGEQUEUE: {
-                    loadUrl(BridgeInstance.JS_FETCH_QUEUE_FROM_JAVA, new BridgeCallBack());
+                    String methodName = BridgeUtil.parseFunctionName(BridgeInstance.JS_FETCH_QUEUE_FROM_JAVA);
+                    if (!responseCallbacks.containsKey(methodName)){
+                        responseCallbacks.put(methodName, new BridgeCallBack());
+                    }
+                    loadUrl(BridgeInstance.JS_FETCH_QUEUE_FROM_JAVA);
                 }
                 break;
                 case DISPATHCMESSAGE: {
-                    loadUrl(msg.obj + "", null);
+                    loadUrl(msg.obj + "");
                 }
                 break;
             }
@@ -157,12 +181,11 @@ public class BridgeInstance {
         }
     };
 
-    private void loadUrl(String jsUrl, BridgeCallBackFunction returnCallback) {
+    private void loadUrl(String jsUrl) {
         if (webView == null) {
             return;
         }
         webView.loadUrl(jsUrl);
-        responseCallbacks.put(BridgeUtil.parseFunctionName(jsUrl), returnCallback);
     }
 
     /**

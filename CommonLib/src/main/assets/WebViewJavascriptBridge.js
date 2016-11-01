@@ -9,12 +9,21 @@
 
     var CUSTOM_PROTOCOL_SCHEME = 'wvjbscheme';
     var QUEUE_HAS_MESSAGE = '__WVJB_QUEUE_MESSAGE__';
+    var QUEUE_HAS_MESSAGE_SYN = '__SYN_WVJB_QUEUE_MESSAGE__';
 
     var responseCallbacks = {};
     var uniqueId = 1;
 
-    function registerHandler(handlerName, handler) {
-        messageHandlers[handlerName] = handler;
+    function callHandlerSyn(handlerName, data) {
+      var messageQueueString = JSON.stringify({ handlerName:handlerName, data:data });
+
+      var result = Base64.encode(messageQueueString);
+
+      var returnData = prompt(CUSTOM_PROTOCOL_SCHEME + '://'+QUEUE_HAS_MESSAGE_SYN+"/" + result);
+
+      alert(returnData);
+
+      return returnData;
     }
 
     function callHandler(handlerName, data, responseCallback) {
@@ -97,7 +106,7 @@
     }
 
     window.window.WebViewJavascriptBridge = {
-            registerHandler: registerHandler,
+            callHandlerSyn: callHandlerSyn,
             callHandler: callHandler,
             _fetchQueue: _fetchQueue,
             _handleMessageFromNative: _handleMessageFromNative

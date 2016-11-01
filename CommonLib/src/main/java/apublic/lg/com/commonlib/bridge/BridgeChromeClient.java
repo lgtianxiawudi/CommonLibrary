@@ -12,16 +12,20 @@ import apublic.lg.com.commonlib.util.LogUtil;
 
 public class BridgeChromeClient extends WebChromeClient {
     private boolean mIsInjectedJS = false;
+
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
         if (message.startsWith(BridgeInstance.YY_RETURN_DATA)) { // 如果是返回数据
             BridgeInstance.getInstance().handlerReturnData(message);
-        } else if (message.startsWith(BridgeInstance.YY_OVERRIDE_SCHEMA)) { //
+            result.confirm();
+        } else if (message.startsWith(BridgeInstance.YY_TETCH_QUEUE_SYN)) {
+            BridgeInstance.getInstance().handlerReturnDataSyn(message, result);
+        } else if (message.startsWith(BridgeInstance.YY_FETCH_QUEUE)) { //
             BridgeInstance.getInstance().flushMessageQueue();
+            result.confirm();
+        }else {
+            result.confirm();
         }
-
-        result.confirm();
-
         return true;
     }
 
