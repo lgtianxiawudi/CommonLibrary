@@ -37,7 +37,7 @@ public class BridgeChromeClient extends WebChromeClient {
         } else if (!mIsInjectedJS) {
             BridgeInstance.getInstance().webViewLoadLocalJs();
             mIsInjectedJS = true;
-            LogUtil.d(" inject js interface completely on progress " + newProgress);
+            LogUtil.d(" inject js interfaces completely on progress " + newProgress);
 
         }
     }
