@@ -2,6 +2,11 @@ package apublic.lg.com.demo;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.util.SparseArrayCompat;
+import android.util.SparseArray;
+import android.util.SparseBooleanArray;
+import android.util.SparseIntArray;
+import android.util.SparseLongArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
