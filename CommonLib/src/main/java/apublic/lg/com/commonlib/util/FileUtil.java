@@ -4,6 +4,8 @@ package apublic.lg.com.commonlib.util;
 import android.content.Context;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,47 +19,100 @@ import okio.Okio;
  */
 
 public class FileUtil {
-    public static String inputStreamToString(InputStream inputStream,Charset charset){
-//        String result = null;
-//        BufferedSource bufferedSource = Okio.buffer(Okio.source(inputStream));
-//        try {
-//            result = bufferedSource.readString(charset);
-//        } catch (IOException e) {
-//            LogUtil.e(e.getMessage());
-//        }
-//        return result;
+
+
+    public static long fileToLong(File file) {
+        long result = -1;
+        BufferedSource bufferedSource = null;
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = null;
-            StringBuilder sb = new StringBuilder();
-            do {
-                line = bufferedReader.readLine();
-                if (line != null && !line.matches("^\\s*\\/\\/.*")) {
-                    sb.append(line);
-                }
-            } while (line != null);
-
-            bufferedReader.close();
-            inputStream.close();
-
-            return sb.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                }
-            }
+            bufferedSource = Okio.buffer(Okio.source(file));
+        } catch (FileNotFoundException e) {
+            LogUtil.e(e.getMessage());
         }
-        return null;
+        try {
+            result = bufferedSource.readLong();
+        } catch (IOException e) {
+            LogUtil.e(e.getMessage());
+        }
+        return result;
     }
-    public static String inputStreamToString(InputStream inputStream){
-        return inputStreamToString(inputStream,Charset.defaultCharset());
+
+    public static int fileToInt(File file) {
+        int result = -1;
+        BufferedSource bufferedSource = null;
+        try {
+            bufferedSource = Okio.buffer(Okio.source(file));
+        } catch (FileNotFoundException e) {
+            LogUtil.e(e.getMessage());
+        }
+        try {
+            result = bufferedSource.readInt();
+        } catch (IOException e) {
+            LogUtil.e(e.getMessage());
+        }
+        return result;
     }
-    public static InputStream getAssetsToInputSteam(Context context, String name){
-        if (StrUtil.isEmpty(name)){
+
+    public static String fileToString(File file, Charset charset) {
+        String result = null;
+        BufferedSource bufferedSource = null;
+        try {
+            bufferedSource = Okio.buffer(Okio.source(file));
+        } catch (FileNotFoundException e) {
+            LogUtil.e(e.getMessage());
+        }
+        try {
+            result = bufferedSource.readString(charset);
+        } catch (IOException e) {
+            LogUtil.e(e.getMessage());
+        }
+        return result;
+    }
+
+    public static String fileToString(File file) {
+        return fileToString(file, Charset.defaultCharset());
+    }
+
+
+    public static long inputSteamToLong(InputStream inputStream) {
+        long result = -1;
+        BufferedSource bufferedSource = Okio.buffer(Okio.source(inputStream));
+        try {
+            result = bufferedSource.readLong();
+        } catch (IOException e) {
+            LogUtil.e(e.getMessage());
+        }
+        return result;
+    }
+
+    public static int inputSteamToInt(InputStream inputStream) {
+        int result = -1;
+        BufferedSource bufferedSource = Okio.buffer(Okio.source(inputStream));
+        try {
+            result = bufferedSource.readInt();
+        } catch (IOException e) {
+            LogUtil.e(e.getMessage());
+        }
+        return result;
+    }
+
+    public static String inputStreamToString(InputStream inputStream, Charset charset) {
+        String result = null;
+        BufferedSource bufferedSource = Okio.buffer(Okio.source(inputStream));
+        try {
+            result = bufferedSource.readString(charset);
+        } catch (IOException e) {
+            LogUtil.e(e.getMessage());
+        }
+        return result;
+    }
+
+    public static String inputStreamToString(InputStream inputStream) {
+        return inputStreamToString(inputStream, Charset.defaultCharset());
+    }
+
+    public static InputStream getAssetsToInputSteam(Context context, String name) {
+        if (StrUtil.isEmpty(name)) {
             return null;
         }
         try {

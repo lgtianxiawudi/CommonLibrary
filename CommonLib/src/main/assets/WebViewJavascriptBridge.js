@@ -2,20 +2,14 @@
     if (window.WebViewJavascriptBridge) {
         return;
     }
-    window.WebViewJavascriptBridge = {
-        registerHandler: registerHandler,
-        callHandler: callHandler,
-        _fetchQueue: _fetchQueue,
-        _handleMessageFromNative: _handleMessageFromNative
-    };
 
     var messagingIframe;
     var sendMessageQueue = [];
     var messageHandlers = {};
-    
+
     var CUSTOM_PROTOCOL_SCHEME = 'wvjbscheme';
     var QUEUE_HAS_MESSAGE = '__WVJB_QUEUE_MESSAGE__';
-    
+
     var responseCallbacks = {};
     var uniqueId = 1;
 
@@ -24,7 +18,6 @@
     }
 
     function callHandler(handlerName, data, responseCallback) {
-        alert(data);
         if (arguments.length == 2 && typeof data == 'function') {
             responseCallback = data;
             data = null;
@@ -43,7 +36,7 @@
 
         sendMessageQueue.push(message);
 
-               
+
         prompt(CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE);
     }
 
@@ -54,7 +47,7 @@
         sendMessageQueue = [];
 
         var result = Base64.encode(messageQueueString);
-        
+
         prompt(CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + result);
 
     }
@@ -85,7 +78,7 @@
                         _doSend({ responseId:callbackResponseId, responseData:responseData });
                     };
                 }
-                
+
                 var handler = messageHandlers[message.handlerName];
                 try {
                     handler(message.data, responseCallback);
@@ -102,4 +95,12 @@
     function _handleMessageFromNative(messageJSON) {
         _dispatchMessageFromObjC(messageJSON);
     }
-})();
+
+    window.window.WebViewJavascriptBridge = {
+            registerHandler: registerHandler,
+            callHandler: callHandler,
+            _fetchQueue: _fetchQueue,
+            _handleMessageFromNative: _handleMessageFromNative
+    };
+}
+)();

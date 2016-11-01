@@ -85,11 +85,11 @@ public class BridgeInstance {
      */
     public void webViewLoadLocalJs() {
         LogUtil.e("webViewLoadLocalJs", "webViewLoadLocalJs");
+        this.webView.clearCache(true);
         String base64 = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), base64Js));
         String jsContent = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), toLoadJs));
-        this.webView.loadUrl(JAVASCRIPT_STR+"alert('ss');");
-        this.webView.loadUrl(JAVASCRIPT_STR + base64);
-        this.webView.loadUrl(JAVASCRIPT_STR + jsContent);
+        this.webView.evaluateJavascript(JAVASCRIPT_STR + base64,null);
+        this.webView.evaluateJavascript(JAVASCRIPT_STR + jsContent,null);
     }
 
     /**
