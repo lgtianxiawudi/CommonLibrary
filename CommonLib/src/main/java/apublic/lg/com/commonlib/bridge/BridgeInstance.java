@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.webkit.JsPromptResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
 import java.util.ArrayList;
@@ -23,25 +24,18 @@ import apublic.lg.com.commonlib.util.StrUtil;
 
 public class BridgeInstance {
     public final static String YY_OVERRIDE_SCHEMA = "wvjbscheme://";
-    public final static String YY_RETURN_DATA = YY_OVERRIDE_SCHEMA + "return/";//格式为   yy://return/{function}/returncontent
-    public final static String YY_FETCH_QUEUE = YY_OVERRIDE_SCHEMA + "__WVJB_QUEUE_MESSAGE__";//wvjbscheme://__WVJB_QUEUE_MESSAGE__
+    public final static String YY_TETCH_QUEUE = YY_OVERRIDE_SCHEMA + "__WVJB_QUEUE_MESSAGE__";//格式为   yy://return/{function}/returncontent
     public final static String YY_TETCH_QUEUE_SYN = YY_OVERRIDE_SCHEMA+"__SYN_WVJB_QUEUE_MESSAGE__/";
     public final static String EMPTY_STR = "";
-    public final static String UNDERLINE_STR = "_";
-    public final static String SPLIT_MARK = "/";
-    public final static String CALLBACK_ID_FORMAT = "JAVA_CB_%s";
     public final static String JS_HANDLE_MESSAGE_FROM_JAVA = "javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');";
     public final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:WebViewJavascriptBridge._fetchQueue();";
     public final static String JAVASCRIPT_STR = "javascript:";
     public static final String toLoadJs = "WebViewJavascriptBridge.js";
-    public static final String base64Js = "base64.min.js";
 
     private final static int FLUSHMESSAGEQUEUE = 0;
     private final static int DISPATHCMESSAGE = 1;
 
-    public Map<String, BridgeCallBackFunction> responseCallbacks = new HashMap<String, BridgeCallBackFunction>();
     public Map<String, BridgeHandler> messageHandlers = new HashMap<String, BridgeHandler>();
-//    private List<BrgideMessage> startupMessage = new ArrayList<BrgideMessage>();
     private long uniqueId = 0;
 
     private static BridgeInstance singleton;
@@ -88,27 +82,8 @@ public class BridgeInstance {
     public void webViewLoadLocalJs() {
         LogUtil.e("webViewLoadLocalJs", "webViewLoadLocalJs");
         this.webView.clearCache(true);
-//        String base64 = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), base64Js));
-//        String jsContent = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), toLoadJs));
-//        this.webView.evaluateJavascript(JAVASCRIPT_STR + base64,null);
-//        this.webView.evaluateJavascript(JAVASCRIPT_STR + jsContent,null);
-        String base64 = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), "jstonative.js"));
+        String base64 = FileUtil.inputStreamToString(FileUtil.getAssetsToInputSteam(webView.getContext(), "WebViewJavascriptBridge.js"));
         this.webView.evaluateJavascript(JAVASCRIPT_STR + base64,null);
-    }
-
-    /**
-     * 接受返回的数据
-     * @param url
-     */
-    public void handlerReturnData(String url) {
-        String functionName = BridgeUtil.getFunctionFromReturnUrl(url);
-        BridgeCallBackFunction f = responseCallbacks.get(functionName);
-        String data = BridgeUtil.getDataFromReturnUrl(url);
-        if (f != null) {
-            f.onCallBack(data);
-            responseCallbacks.remove(functionName);
-            return;
-        }
     }
 
     /**
@@ -134,11 +109,7 @@ public class BridgeInstance {
      * @param m
      */
     public void queueMessage(BrgideMessage m) {
-//        if (startupMessage != null) {
-//            startupMessage.add(m);
-//        } else {
             dispatchMessage(m);
-//        }
     }
 
     private void dispatchMessage(BrgideMessage m) {
@@ -167,11 +138,7 @@ public class BridgeInstance {
 
             switch (msg.arg1) {
                 case FLUSHMESSAGEQUEUE: {
-                    String methodName = BridgeUtil.parseFunctionName(BridgeInstance.JS_FETCH_QUEUE_FROM_JAVA);
-                    if (!responseCallbacks.containsKey(methodName)){
-                        responseCallbacks.put(methodName, new BridgeCallBack());
-                    }
-                    loadUrl(BridgeInstance.JS_FETCH_QUEUE_FROM_JAVA);
+                    loadJs(BridgeInstance.JS_FETCH_QUEUE_FROM_JAVA);
                 }
                 break;
                 case DISPATHCMESSAGE: {
@@ -183,6 +150,17 @@ public class BridgeInstance {
         }
     };
 
+    private void loadJs(String js) {
+        if (webView == null) {
+            return;
+        }
+        webView.evaluateJavascript(js, new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+                new BridgeCallBack().onCallBack(value);
+            }
+        });
+    }
     private void loadUrl(String jsUrl) {
         if (webView == null) {
             return;
@@ -202,37 +180,4 @@ public class BridgeInstance {
         }
     }
 
-    /**
-     * call javascript registered handler
-     *
-     * @param handlerName
-     * @param data
-     * @param callBack
-     */
-    public void callHandler(String handlerName, String data, BridgeCallBackFunction callBack) {
-        doSend(handlerName, data, callBack);
-    }
-
-    /**
-     * send a message to javascript
-     *
-     * @param handlerName
-     * @param data
-     * @param responseCallback
-     */
-    private void doSend(String handlerName, String data, BridgeCallBackFunction responseCallback) {
-        BrgideMessage m = new BrgideMessage();
-        if (!StrUtil.isEmpty(data)) {
-            m.setData(data);
-        }
-        if (responseCallback != null) {
-            String callbackStr = String.format(BridgeInstance.CALLBACK_ID_FORMAT, ++uniqueId + (BridgeInstance.UNDERLINE_STR + SystemClock.currentThreadTimeMillis()));
-            responseCallbacks.put(callbackStr, responseCallback);
-            m.setCallbackId(callbackStr);
-        }
-        if (!StrUtil.isEmpty(handlerName)) {
-            m.setHandlerName(handlerName);
-        }
-        queueMessage(m);
-    }
 }

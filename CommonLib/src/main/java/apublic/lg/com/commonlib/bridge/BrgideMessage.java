@@ -89,7 +89,7 @@ public class BrgideMessage {
     public static List<BrgideMessage> toArrayList(String jsonStr){
         List<BrgideMessage> list = new ArrayList<BrgideMessage>();
         try {
-            JSONArray jsonArray = new JSONArray(jsonStr);
+            JSONArray jsonArray = new JSONArray(jsonStr.replace("\\",""));
             for(int i = 0; i < jsonArray.length(); i++){
                 BrgideMessage m = new BrgideMessage();
                 JSONObject jsonObject = jsonArray.getJSONObject(i);

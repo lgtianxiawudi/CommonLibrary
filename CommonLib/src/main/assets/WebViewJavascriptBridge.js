@@ -49,13 +49,11 @@
 
     function _fetchQueue() {
 
-        var messageQueueString = JSON.stringify(sendMessageQueue);
+        var messageQueueString = sendMessageQueue;
 
         sendMessageQueue = [];
 
-        var result = Base64.encode(messageQueueString);
-
-        prompt(CUSTOM_PROTOCOL_SCHEME + '://return/_fetchQueue/' + result);
+        return messageQueueString;
 
     }
 

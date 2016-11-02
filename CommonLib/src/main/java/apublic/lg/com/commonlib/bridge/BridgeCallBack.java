@@ -25,41 +25,34 @@ public class BridgeCallBack implements BridgeCallBackFunction {
         for (int i = 0; i < list.size(); i++) {
             BrgideMessage m = list.get(i);
             String responseId = m.getResponseId();
-            // 是否是response Native发送消息，接受回调
-            if (!StrUtil.isEmpty(responseId)) {
-                BridgeCallBackFunction function = BridgeInstance.getInstance().responseCallbacks.get(responseId);
-                String responseData = m.getResponseData();
-                function.onCallBack(responseData);
-                BridgeInstance.getInstance().responseCallbacks.remove(responseId);
-            } else {//Js发送消息，接受回调
-                BridgeCallBackFunction responseFunction = null;
-                // if had callbackId
-                final String callbackId = m.getCallbackId();
-                if (!StrUtil.isEmpty(callbackId)) {
-                    responseFunction = new BridgeCallBackFunction() {
-                        @Override
-                        public void onCallBack(String data) {
-                            BrgideMessage responseMsg = new BrgideMessage();
-                            responseMsg.setResponseId(callbackId);
-                            responseMsg.setResponseData(data);
-                            BridgeInstance.getInstance().queueMessage(responseMsg);
-                        }
-                    };
-                } else {
-                    responseFunction = new BridgeCallBackFunction() {
-                        @Override
-                        public void onCallBack(String data) {
-                            // do nothing
-                        }
-                    };
-                }
-                BridgeHandler handler = null;
-                if (!StrUtil.isEmpty(m.getHandlerName())) {
-                    handler = BridgeInstance.getInstance().messageHandlers.get(m.getHandlerName());
-                }
-                if (handler != null){
-                    handler.handler(m.getData(), responseFunction);
-                }
+            //Js发送消息，接受回调
+            BridgeCallBackFunction responseFunction = null;
+            // if had callbackId
+            final String callbackId = m.getCallbackId();
+            if (!StrUtil.isEmpty(callbackId)) {
+                responseFunction = new BridgeCallBackFunction() {
+                    @Override
+                    public void onCallBack(String data) {
+                        BrgideMessage responseMsg = new BrgideMessage();
+                        responseMsg.setResponseId(callbackId);
+                        responseMsg.setResponseData(data);
+                        BridgeInstance.getInstance().queueMessage(responseMsg);
+                    }
+                };
+            } else {
+                responseFunction = new BridgeCallBackFunction() {
+                    @Override
+                    public void onCallBack(String data) {
+                        // do nothing
+                    }
+                };
+            }
+            BridgeHandler handler = null;
+            if (!StrUtil.isEmpty(m.getHandlerName())) {
+                handler = BridgeInstance.getInstance().messageHandlers.get(m.getHandlerName());
+            }
+            if (handler != null) {
+                handler.handler(m.getData(), responseFunction);
             }
         }
     }

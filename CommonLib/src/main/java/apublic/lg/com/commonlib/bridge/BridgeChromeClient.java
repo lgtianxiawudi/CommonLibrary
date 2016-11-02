@@ -15,14 +15,11 @@ public class BridgeChromeClient extends WebChromeClient {
 
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
-        if (message.startsWith(BridgeInstance.YY_RETURN_DATA)) { // 如果是返回数据
-            BridgeInstance.getInstance().handlerReturnData(message);
+        if (message.equals(BridgeInstance.YY_TETCH_QUEUE)) { // 如果是返回数据
+            BridgeInstance.getInstance().flushMessageQueue();
             result.confirm();
         } else if (message.startsWith(BridgeInstance.YY_TETCH_QUEUE_SYN)) {
             BridgeInstance.getInstance().handlerReturnDataSyn(message, result);
-        } else if (message.startsWith(BridgeInstance.YY_FETCH_QUEUE)) { //
-            BridgeInstance.getInstance().flushMessageQueue();
-            result.confirm();
         }else {
             result.confirm();
         }
