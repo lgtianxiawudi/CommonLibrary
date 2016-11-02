@@ -1,7 +1,7 @@
 (function() {
     if (window.WebViewJavascriptBridge) {
         return;
-    }
+     }
 
     var messagingIframe;
     var sendMessageQueue = [];
@@ -20,8 +20,6 @@
       var result = Base64.encode(messageQueueString);
 
       var returnData = prompt(CUSTOM_PROTOCOL_SCHEME + '://'+QUEUE_HAS_MESSAGE_SYN+"/" + result);
-
-      alert(returnData);
 
       return returnData;
     }
@@ -105,11 +103,10 @@
         _dispatchMessageFromObjC(messageJSON);
     }
 
-    window.window.WebViewJavascriptBridge = {
+    window.WebViewJavascriptBridge = {
             callHandlerSyn: callHandlerSyn,
             callHandler: callHandler,
             _fetchQueue: _fetchQueue,
             _handleMessageFromNative: _handleMessageFromNative
     };
-}
-)();
+})();
