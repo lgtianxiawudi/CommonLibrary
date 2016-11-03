@@ -24,7 +24,6 @@ public class BridgeCallBack implements BridgeCallBackFunction {
         }
         for (int i = 0; i < list.size(); i++) {
             BrgideMessage m = list.get(i);
-            String responseId = m.getResponseId();
             //Js发送消息，接受回调
             BridgeCallBackFunction responseFunction = null;
             // if had callbackId

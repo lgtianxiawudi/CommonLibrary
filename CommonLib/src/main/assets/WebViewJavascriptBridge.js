@@ -14,6 +14,10 @@
     var responseCallbacks = {};
     var uniqueId = 1;
 
+    function registerHandler(handlerName, handler) {
+        messageHandlers[handlerName] = handler;
+    }
+
     function callHandlerSyn(handlerName, data) {
       var messageQueueString = JSON.stringify({ handlerName:handlerName, data:data });
 
@@ -77,22 +81,7 @@
                 responseCallback(result);
                 delete responseCallbacks[message.responseId];
             } else {
-                if (message.callbackId) {
-                    var callbackResponseId = message.callbackId;
-                    responseCallback = function(responseData) {
-                        _doSend({ responseId:callbackResponseId, responseData:responseData });
-                    };
-                }
-
-                var handler = messageHandlers[message.handlerName];
-                try {
-                    handler(message.data, responseCallback);
-                } catch(exception) {
-                    console.log("WebViewJavascriptBridge: WARNING: javascript handler threw.", message, exception);
-                }
-                if (!handler) {
-                    console.log("WebViewJavascriptBridge: WARNING: no handler for message from ObjC:", message);
-                }
+                console.log("WebViewJavascriptBridge: WARNING: no message.responseId for message from ObjC:", message);
             }
         // },1000);
     }
@@ -101,10 +90,29 @@
         _dispatchMessageFromObjC(messageJSON);
     }
 
+    function _sendMessageFromNative(messageJSON){
+      var message = JSON.parse(messageJSON);
+      var messageHandler;
+      var responseCallback;
+      if (message.callbackId) {
+        messageHandler = messageHandlers[message.handlerName];
+        if (!messageHandler) {
+          return;
+        }
+        var messageHandlerResult = messageHandler(message.data);
+        message.responseId = message.callbackId;
+        message.callbackId = "";
+        message.data = messageHandlerResult;
+        return message;
+      }
+    }
+
     window.WebViewJavascriptBridge = {
+            registerHandler: registerHandler,
             callHandlerSyn: callHandlerSyn,
             callHandler: callHandler,
             _fetchQueue: _fetchQueue,
-            _handleMessageFromNative: _handleMessageFromNative
+            _handleMessageFromNative: _handleMessageFromNative,
+            _sendMessageFromNative:_sendMessageFromNative
     };
 })();

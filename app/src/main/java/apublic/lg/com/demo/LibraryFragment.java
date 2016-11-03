@@ -2,6 +2,7 @@ package apublic.lg.com.demo;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +44,8 @@ public class LibraryFragment extends BaseFragment {
         return content;
     }
 
+    Handler handler = new Handler();
+
     @Override
     public void onResume() {
         super.onResume();
@@ -52,8 +55,21 @@ public class LibraryFragment extends BaseFragment {
             public void handler(String data, BridgeCallBackFunction function) {
                 LogUtil.e(data);
                 function.onCallBack("Native return");
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        bridgeInstance.sendMsg("lg", "111111", new BridgeCallBackFunction() {
+                            @Override
+                            public void onCallBack(String data) {
+                                LogUtil.d(data+"");
+                            }
+                        });
+                    }
+                },10*1000);
             }
         });
         content.loadUrl("file:///android_asset/demo.html");
+
+
     }
 }

@@ -28,14 +28,17 @@ public class BridgeInstance {
     public final static String YY_TETCH_QUEUE_SYN = YY_OVERRIDE_SCHEMA+"__SYN_WVJB_QUEUE_MESSAGE__/";
     public final static String EMPTY_STR = "";
     public final static String JS_HANDLE_MESSAGE_FROM_JAVA = "javascript:WebViewJavascriptBridge._handleMessageFromNative('%s');";
+    public final static String JS_SEND_MESSAGE_FROM_JAVA = "javascript:WebViewJavascriptBridge._sendMessageFromNative('%s');";
     public final static String JS_FETCH_QUEUE_FROM_JAVA = "javascript:WebViewJavascriptBridge._fetchQueue();";
     public final static String JAVASCRIPT_STR = "javascript:";
     public static final String toLoadJs = "WebViewJavascriptBridge.js";
 
-    private final static int FLUSHMESSAGEQUEUE = 0;
-    private final static int DISPATHCMESSAGE = 1;
+    public final static int DISJSGETDATAFROMJS = 0;
+    public final static int DISPATHCMESSAGE = 1;
+    public final static int DISSENDDATATOJS = 2;
 
     public Map<String, BridgeHandler> messageHandlers = new HashMap<String, BridgeHandler>();
+    public Map<String,BridgeCallBackFunction> sendMessageCallBack = new HashMap<>();
     private long uniqueId = 0;
 
     private static BridgeInstance singleton;
@@ -118,18 +121,19 @@ public class BridgeInstance {
         messageJson = messageJson.replaceAll("(\\\\)([^utrn])", "\\\\\\\\$1$2");
         messageJson = messageJson.replaceAll("(?<=[^\\\\])(\")", "\\\\\"");
         String javascriptCommand = String.format(BridgeInstance.JS_HANDLE_MESSAGE_FROM_JAVA, messageJson);
-        Message message = handle.obtainMessage();
-        message.arg1 = DISPATHCMESSAGE;
-        message.obj = javascriptCommand;
-        handle.sendMessage(message);
+        flushMessageQueue(DISPATHCMESSAGE,javascriptCommand);
     }
 
     /**
      * 发送通知去请求数据
      */
-    void flushMessageQueue() {
-        handle.sendEmptyMessage(FLUSHMESSAGEQUEUE);
+    void flushMessageQueue(int type,String msg) {
+        Message message = new Message();
+        message.arg1 = type;
+        message.obj = msg;
+        handle.sendMessage(message);
     }
+
 
 
     Handler handle = new Handler(Looper.getMainLooper()) {
@@ -137,8 +141,12 @@ public class BridgeInstance {
         public void dispatchMessage(android.os.Message msg) {
 
             switch (msg.arg1) {
-                case FLUSHMESSAGEQUEUE: {
-                    loadJs(BridgeInstance.JS_FETCH_QUEUE_FROM_JAVA);
+                case DISJSGETDATAFROMJS: {
+                    loadJs(msg.obj+"",new BridgeCallBack());
+                }
+                break;
+                case DISSENDDATATOJS:{
+                    loadJs(msg.obj+"",new BridgeSendCallback());
                 }
                 break;
                 case DISPATHCMESSAGE: {
@@ -150,14 +158,16 @@ public class BridgeInstance {
         }
     };
 
-    private void loadJs(String js) {
+    private void loadJs(String js, final BridgeCallBackFunction bridgeCallBack) {
         if (webView == null) {
             return;
         }
         webView.evaluateJavascript(js, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
-                new BridgeCallBack().onCallBack(value);
+                if (bridgeCallBack!=null){
+                    bridgeCallBack.onCallBack(value);
+                }
             }
         });
     }
@@ -178,6 +188,21 @@ public class BridgeInstance {
         if (handler != null) {
             messageHandlers.put(handlerName, handler);
         }
+    }
+
+    public void sendMsg(String handlerName,String data,BridgeCallBackFunction backFunction){
+        BrgideMessage brgideMessage = new BrgideMessage();
+        String callBackId = System.currentTimeMillis()+"_"+Math.random()*10000;
+        sendMessageCallBack.put(callBackId,backFunction);
+        brgideMessage.setCallbackId(callBackId);
+        brgideMessage.setData(data);
+        brgideMessage.setHandlerName(handlerName);
+        String messageJson = brgideMessage.toJson();
+        //escape special characters for json string
+        messageJson = messageJson.replaceAll("(\\\\)([^utrn])", "\\\\\\\\$1$2");
+        messageJson = messageJson.replaceAll("(?<=[^\\\\])(\")", "\\\\\"");
+        String javascriptCommand = String.format(BridgeInstance.JS_SEND_MESSAGE_FROM_JAVA, messageJson);
+        flushMessageQueue(DISSENDDATATOJS,javascriptCommand);
     }
 
 }
