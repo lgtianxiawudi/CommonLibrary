@@ -138,7 +138,7 @@ public class BridgeInstance {
 
     Handler handle = new Handler(Looper.getMainLooper()) {
         @Override
-        public void dispatchMessage(android.os.Message msg) {
+        public void dispatchMessage(Message msg) {
 
             switch (msg.arg1) {
                 case DISJSGETDATAFROMJS: {

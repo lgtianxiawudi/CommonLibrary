@@ -3,18 +3,11 @@ package apublic.lg.com.commonlib.base.ui;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-
 import apublic.lg.com.commonlib.R;
 import apublic.lg.com.commonlib.swipeback.SwipeBackActivity;
 import apublic.lg.com.commonlib.util.AbSystemBarTintManager;
@@ -36,8 +29,7 @@ public abstract class BaseActivity extends SwipeBackActivity {
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_root);
         getWindow().setLayout(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-        AbSystemBarTintManager tintManager = new AbSystemBarTintManager(this);
-        tintManager.setTintColor(Color.WHITE); //  set status bar color
+        AbSystemBarTintManager.setWindowStatusBarColor(this, Color.BLACK);
         initBaseView();
     }
 

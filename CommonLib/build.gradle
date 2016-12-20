@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
 
@@ -40,7 +40,7 @@ publish {
     userOrg = 'lgtianxiawudi'//bintray.com用户名
     groupId = 'apublic.lg.com.commonlib'//jcenter上的路径
     artifactId = 'CommonLib'//项目名称
-    publishVersion = '0.0.4'//版本号
+    publishVersion = '0.0.5'//版本号
     desc = 'Oh hi, this is a nice description for a project, right?'//描述，不重要
     website = 'https://github.com/lgtianxiawudi/StudyDemo'//网站，不重要；尽量模拟github上的地址，例如我这样的；当然你有地址最好了
     licences = ['Apache-2.0']
